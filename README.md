@@ -17,8 +17,8 @@ devtools::install_github("vpnagraj/yawp", build_vignettes = TRUE)
 
 Note that the install command above will install the package from GitHub
 *and* build vignettes. If you would prefer not to build vignettes upon
-install, then set `build_vignettes = FALSE` (default in
-`devtools::install_github()`).
+install then set `build_vignettes = FALSE`, which is the default in
+`devtools::install_github()`.
 
 ## Features
 
@@ -27,13 +27,13 @@ install, then set `build_vignettes = FALSE` (default in
   - `f1()`: Calculate F1 score
   - `first_char()`: Extract the first character from a string
   - `get_mode()`: Find the mode
-  - `gg_zoom()`: Zoom in on a ggplot2 plot (*experimental*)
+  - `gg_zoom()`: Zoom in on a ggplot2 plot (*EXPERIMENTAL*)
   - `mav()`: Calculate moving average
   - `medf()`: Format median
   - `more()`: Add filler rows to a data frame
   - `propf()`: Calculate and format proportion
   - `read_repo()`: Read files directly from a GitHub repository
-    (*experimental*)
+    (*EXPERIMENTAL*)
   - `summary_se()`: Calculate mean and standard error
   - `theme_mathbook()`: Custom “math book” ggplot2 theme
 
@@ -62,8 +62,8 @@ other tools. For example:
   - The moving average functionality in `mav()` is available elsewhere,
     including for example in `slide()` from
     [slider](https://CRAN.R-project.org/package=slider)
-  - While `f1()` calcultes the F1 score, other available functions such
-    `f_meas()` from
+  - While `f1()` calculates the F1 score, other available functions such
+    as `f_meas()` from
     [yardstick](https://CRAN.R-project.org/package=yardstick) may
     accommodate more generic applications (i.e. applying weights to
     precision and recall)

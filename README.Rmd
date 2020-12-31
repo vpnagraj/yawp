@@ -26,7 +26,7 @@ A collection of documented, tested, and packaged helper functions.
 devtools::install_github("vpnagraj/yawp", build_vignettes = TRUE)
 ```
 
-Note that the install command above will install the package from GitHub *and* build vignettes. If you would prefer not to build vignettes upon install, then set `build_vignettes = FALSE` (default in `devtools::install_github()`).
+Note that the install command above will install the package from GitHub *and* build vignettes. If you would prefer not to build vignettes upon install then set `build_vignettes = FALSE`, which is the default in `devtools::install_github()`.
 
 ## Features
 
@@ -35,12 +35,12 @@ Note that the install command above will install the package from GitHub *and* b
 - `f1()`: Calculate F1 score
 - `first_char()`: Extract the first character from a string
 - `get_mode()`: Find the mode
-- `gg_zoom()`: Zoom in on a ggplot2 plot (*experimental*)
+- `gg_zoom()`: Zoom in on a ggplot2 plot (*EXPERIMENTAL*)
 - `mav()`: Calculate moving average
 - `medf()`: Format median
 - `more()`: Add filler rows to a data frame
 - `propf()`: Calculate and format proportion
-- `read_repo()`: Read files directly from a GitHub repository (*experimental*)
+- `read_repo()`: Read files directly from a GitHub repository (*EXPERIMENTAL*)
 - `summary_se()`: Calculate mean and standard error
 - `theme_mathbook()`: Custom "math book" ggplot2 theme
 
@@ -59,5 +59,5 @@ browseVignettes(package = "yawp")
 - `betwixt()` builds on the concept originally implemented in the `between()` function in [dplyr](https://CRAN.R-project.org/package=dplyr) but adds a feature to ignore specific values
 - `summary_se()` re-implements `summarySE()` from ["The Cookbook for R"](http://www.cookbook-r.com/Manipulating_data/Summarizing_data/) with tidy eval syntax
 - The moving average functionality in `mav()` is available elsewhere, including for example in `slide()` from [slider](https://CRAN.R-project.org/package=slider)
-- While `f1()` calcultes the F1 score, other available functions such `f_meas()` from [yardstick](https://CRAN.R-project.org/package=yardstick) may accommodate more generic applications (i.e. applying weights to precision and recall)
+- While `f1()` calculates the F1 score, other available functions such as `f_meas()` from [yardstick](https://CRAN.R-project.org/package=yardstick) may accommodate more generic applications (i.e. applying weights to precision and recall)
 
