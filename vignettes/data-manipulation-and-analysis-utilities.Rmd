@@ -1,0 +1,262 @@
+---
+title: "Data Manipulation and Analysis Utilities"
+output: 
+  rmarkdown::html_vignette:
+    toc: true
+vignette: >
+  %\VignetteIndexEntry{Data Manipulation and Analysis Utilities}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "##",
+  warning = FALSE,
+  message = FALSE,
+  fig.width = 7,
+  fig.height = 5,
+  fig.align = 'center'
+)
+```
+
+## Setup
+
+The demonstration of `yawp` usage in this vignette depends on functions and data sets from `ggplot2`, `dplyr`, and `tidyr`:
+
+```{r setup}
+library(yawp)
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+theme_set(theme_minimal())
+```
+
+## Manipulate a vector
+
+### Extract first character
+
+The package includes `first_char()`, which is a simple function to pull the first character from a string:
+
+```{r}
+first_char("eye")
+```
+
+The function is case-sensitive:
+
+```{r}
+first_char("Eye")
+```
+
+It can also extract first characters that are not letters:
+
+```{r}
+first_char("3ye")
+```
+
+```{r}
+first_char("!eye")
+```
+
+### Bound at minimum and maximum
+
+The `bound()` function allows you to constrain a vector at maximum and minimum values:
+
+```{r}
+x <- c(-10,-5,0,2,5,10,100)
+
+bound(x, min = 0, max = 10)
+```
+
+```{r}
+x <- rnorm(1000, mean = 0.5, sd = 1)
+
+data.frame(x = x) %>%
+  ggplot(aes(x)) +
+  geom_histogram()
+```
+```{r}
+x <- bound(x, min = 0.1, max = 0.9)
+
+data.frame(x = x) %>%
+  ggplot(aes(x)) +
+  geom_histogram()
+```
+
+### Find values between upper and lower limits
+
+`betwixt()` searches for values that fall between upper and lower boundaries:
+
+```{r}
+x <- 50:60
+
+betwixt(x, lower = 52, upper = 58)
+```
+
+By default the function returns a logical vector of indices that match the range specified, however the `value = TRUE` setting allows values to be returned instead:
+
+```{r}
+betwixt(x, lower = 52, upper = 58, value = TRUE)
+```
+
+The function can also accommodate arbitrary increments in the sequence:
+
+```{r}
+betwixt(x, lower = 52, upper = 58, value = TRUE, by = 2)
+```
+
+And it can ignore certain values as well:
+
+```{r}
+betwixt(x, lower = 52, upper = 58, value = TRUE, by = 2, ignore = 54)
+```
+
+The `betwixt()` utility can also operate on a vector of dates:
+
+```{r}
+dates <- seq(as.Date("2000/1/1"), by = "day", length.out = 365)
+
+betwixt(dates,
+        lower = as.Date("2000/1/10"),
+        upper = as.Date("2000/2/10"),
+        by = "day",
+        ignore = as.Date("2000/1/25"),
+        value = TRUE)
+```
+
+The logical index option (`value = FALSE`) can be useful in subsetting operations:
+
+```{r}
+tibble(date = dates,
+       y = rnorm(365)) %>%
+filter(betwixt(date, 
+               lower = as.Date("2000/1/10"), 
+               upper = as.Date("2000/1/17"), 
+               by = "day", 
+               ignore = as.Date(c("2000/1/12", "2000/1/13")),
+               value = FALSE))
+```
+
+## Summarize and format
+
+### Calculate mode
+
+The `get_mode()` function calculates the most frequent observations:
+
+```{r}
+x <- c(1,1,2,3,3,3,3,3,4)
+
+get_mode(x)
+```
+
+If there are ties, the function can return tied modes with `ties = TRUE`:
+
+```{r}
+x <- c(1,1,2,3,3,3,3,3,4,4,4,4,4)
+
+get_mode(x, ties = TRUE)
+```
+
+The function can also return a "mode" for a character vector:
+
+```{r}
+x <- c("dog","dog","cat","rat","rat","rat","rat")
+
+get_mode(x)
+```
+
+
+### Proportion
+
+The `propf()` utility calculates the count and proportion of values in a vector that match a given value specified by the "level" argument. The output is formatted as string with count and percentage by default:
+
+```{r}
+dogs <- c("dog","dog","dog")
+cats <- c("cat","cat")
+rats <- c("rat","rat","rat","rat","rat")
+animals <- c(dogs,cats,rats)
+
+propf(animals, level = "rat")
+```
+
+The output may be customized to show proportion rather than percentage:
+
+```{r}
+propf(animals, level = "rat", percent = FALSE)
+```
+
+And the function may also accept arguments to `base::formatC()`:
+
+```{r}
+propf(animals, level = "rat", percent = FALSE, decimal.mark = ",")
+```
+
+Formatting counts and proportions can be useful when summarizing data in a table:
+
+```{r}
+starwars %>%
+  select(films,sex) %>%
+  unnest(films) %>%
+  group_by(films) %>%
+  summarise(female = propf(sex, level = "female"))
+```
+
+### Median
+
+The `medf()` function is very similar to `propf()`, except that it calculates the median and 25th, 75th quartiles of a numeric vector:
+
+```{r}
+x <- rpois(1000, lambda = 3)
+
+medf(x)
+```
+
+Like `propf()`, this function can take additional arguments to `base::formatC()`:
+
+```{r}
+medf(x, drop0trailing = TRUE)
+```
+
+The function can be useful for summarizing data in tables too:
+
+```{r}
+state_info <-
+  tibble(state = state.name,
+         region = state.division)
+
+us_rent_income %>%
+  select(NAME, variable, estimate) %>%
+  spread(variable, estimate) %>%
+  filter(!NAME %in% c("District of Columbia", "Puerto Rico")) %>%
+  rename(state = NAME) %>%
+  left_join(state_info) %>%
+  group_by(region) %>%
+  summarise(income = medf(income),
+            rent = medf(rent))
+```
+
+
+### Mean and standard error
+
+`summary_se()` summarizes data by calculating the mean, standard error and a confidence interval across groups. The function accepts bare column names for the variable to summarize ("measure_var") and the optional grouping columns:
+
+```{r}
+ToothGrowth %>%
+  summary_se(len, supp, dose, .ci = 0.95)
+```
+
+```{r}
+ToothGrowth %>%
+  summary_se(len, supp, dose, .ci = 0.95) %>%
+  mutate(dose = paste0("Dose: ", dose, " (mg/day)")) %>%
+  ggplot(aes(supp,mean)) +
+  geom_point() +
+  geom_errorbar(aes(ymin = mean - ci, 
+                    ymax = mean + ci),
+                width = 0.2) +
+  labs(x = "Vitamin C delivery method", y = "Mean length of odontoblasts (95% CI)") +
+  coord_flip() +
+  facet_wrap(~ dose, ncol = 1)
+```
+

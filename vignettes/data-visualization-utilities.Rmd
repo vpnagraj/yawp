@@ -1,0 +1,116 @@
+---
+title: "Data Visualization Utilities"
+output: 
+  rmarkdown::html_vignette:
+    toc: true
+vignette: >
+  %\VignetteIndexEntry{Data Visualization Utilities}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "##",
+  fig.width = 7,
+  fig.height = 5,
+  fig.align = 'center',
+  warning = FALSE,
+  message = FALSE
+)
+```
+
+## Setup
+
+The demonstration of `yawp` usage in this vignette depends on functions and data sets from `ggplot2`, `patchwork`, `dplyr`, and `tidyr`:
+
+```{r setup}
+library(yawp)
+library(ggplot2)
+library(patchwork)
+library(tidyr)
+library(dplyr)
+```
+
+## Themes
+
+### `theme_mathbook()`
+
+```{r}
+mpg %>%
+  ggplot(aes(displ, hwy)) +
+  geom_point(col = "white") +
+  geom_smooth(method = "lm", col = "firebrick", se = FALSE) +
+  facet_wrap(~ trans, ncol = 5) +
+  labs(x = "Displacement (Liters)", y = "Highway MPG") +
+  theme_mathbook()
+```
+
+## Zoom in on a `ggplot2` plot
+
+`gg_zoom()` takes a `ggplot2` plot and "zooms in" on a user-specified subset of the data. The filtering operation is defined in the "zoom_cmd" argument, which accepts the same syntax as the `filter()` function from the `dplyr` package:
+
+```{r}
+p <-
+  population %>%  
+  filter(country %in% c("Finland","Norway","Sweden", "Denmark")) %>%
+  ggplot(aes(year, population)) +
+  geom_line(aes(group = country, col = country) , lwd = 2) +
+  labs(x = "Year", y = "Population") +
+  theme_minimal() +
+  theme(legend.position = "bottom", legend.title = element_blank())
+
+p %>%
+  gg_zoom(., zoom_cmd = year >=2005 & year <= 2010, draw_box = FALSE)
+  
+```
+
+The function includes an option to label the points with another column:
+
+```{r}
+p <-
+  msleep %>%
+  filter(!grepl("elephant", name)) %>%
+  ggplot(aes(brainwt, bodywt)) +
+  geom_point() +
+  labs(x = "Brain weight (kilograms)", y = "Body weight (kilograms)") +
+  theme_minimal() +
+  theme(legend.position = "bottom")
+
+p %>%
+  gg_zoom(., zoom_cmd = brainwt < 0.0005, draw_box = FALSE, to_label = TRUE, label = name)
+```
+
+`gg_zoom()` works with discrete axes as well:
+
+```{r}
+p <-
+  msleep %>%
+  ggplot(aes(vore, sleep_total)) +
+  geom_violin() +
+  labs(x = "Vore", y = "Daily sleep total (hours)") +
+  theme_minimal()
+
+gg_zoom(p, zoom_cmd = vore %in% c("carni", "herbi"), draw_box = FALSE)
+```
+
+The returned value is a `patchwork` object, which means that additional formatting from the [`patchwork` package](https://CRAN.R-project.org/package=patchwork) can be applied:
+
+```{r}
+gg_zoom(p, zoom_cmd = vore %in% c("carni", "herbi"), draw_box = FALSE) +
+  plot_layout(widths = c(3,1)) +
+  plot_annotation(title = "Amount of Sleep by Vore")
+```
+
+```{r}
+layout <- c(
+  area(t = 1, l = 1, b = 2, r = 4),
+  area(t = 3, l = 4, b = 4, r = 5)
+)
+
+gg_zoom(p, zoom_cmd = vore %in% c("carni", "herbi"), draw_box = FALSE) +
+  plot_layout(design = layout) +
+  plot_annotation(title = "Amount of Sleep by Vore")
+```
+
