@@ -23,7 +23,7 @@ A collection of documented, tested, and packaged helper functions.
 ## Installation
 
 ```{r, eval = FALSE}
-devtools::install_github("vpnagraj/yawp", build_vignettes = TRUE)
+devtools::install_github("vpnagraj/yawp", branch = "main", build_vignettes = TRUE)
 ```
 
 Note that the install command above will install the package from GitHub *and* build vignettes. If you would prefer not to build vignettes upon install then set `build_vignettes = FALSE`, which is the default in `devtools::install_github()`.

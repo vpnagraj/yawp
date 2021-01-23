@@ -12,7 +12,7 @@ A collection of documented, tested, and packaged helper functions.
 ## Installation
 
 ``` r
-devtools::install_github("vpnagraj/yawp", build_vignettes = TRUE)
+devtools::install_github("vpnagraj/yawp", branch = "main", build_vignettes = TRUE)
 ```
 
 Note that the install command above will install the package from GitHub
