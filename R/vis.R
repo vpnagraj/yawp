@@ -124,7 +124,7 @@ theme_mathbook <- function() {
                  legend.title = ggplot2::element_blank(),
                  text = ggplot2::element_text(color = "white"),
                  axis.text = ggplot2::element_text(color = "white"),
-                 strip.background = element_rect(fill="white"),
+                 strip.background = ggplot2::element_rect(fill="white"),
                  legend.position = "bottom")
 
 }
