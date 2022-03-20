@@ -55,8 +55,10 @@ read_repo <- function(repo, branch = "master", pattern = NULL, to_tibble = FALSE
                           branch,
                           repo_files)
 
-  ## only get files matching pattern
-  repo_files <- grep(pattern, repo_files, value=TRUE)
+  ## if a pattern is passed use it to parse files of interest
+  if(!is.null(pattern)) {
+    repo_files <- repo_files[grepl(pattern, repo_files)]
+  }
 
   ## Limit the number of files
   if (!is.null(n_files) && is.numeric(n_files)) {
