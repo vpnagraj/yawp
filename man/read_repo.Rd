@@ -10,6 +10,7 @@ read_repo(
   pattern = NULL,
   to_tibble = FALSE,
   .f = readr::read_csv,
+  n_files = NULL,
   ...
 )
 }
@@ -23,6 +24,8 @@ read_repo(
 \item{to_tibble}{Boolean indicating whether or not the function should attempt to return a \code{tibble}; default is \code{FALSE}}
 
 \item{.f}{Function to read each file whose name complies to \code{pattern} argument in the repository; default is \link[readr]{read_csv}}
+
+\item{n_files}{Maximum number of files to read in}
 
 \item{...}{Additional arguments passed to the \code{.f} read function}
 }
@@ -38,4 +41,16 @@ This utility allows files from a GitHub repository to be read in bulk. The patte
 Starting with a call to the GitHub API, this function returns a list of files, which are then filtered to include only those that match the regular expression in the "pattern" argument. The function then internally constructs the raw content URLs and then applies the read function (".f") to each path.
 
 \strong{NOTE}: The API call is unauthenticated. GitHub API request rate limits apply. For specifics, review the GitHub API documentation.
+}
+\examples{
+\dontrun{
+read_repo(repo = "cdcepi/Flusight-forecast-data",
+          branch = "master",
+          pattern = "data-forecasts/.*/.*\\\\.csv",
+          to_tibble = TRUE,
+          .f = readr::read_csv,
+          n_files=10,
+          col_types="DcDccdd",
+          progress=FALSE)
+}
 }
