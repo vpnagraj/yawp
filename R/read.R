@@ -17,15 +17,27 @@
 #' @param pattern Pattern to match file names to be returned; accepts \link[base]{regex}
 #' @param to_tibble Boolean indicating whether or not the function should attempt to return a `tibble`; default is `FALSE`
 #' @param .f Function to read each file whose name complies to `pattern` argument in the repository; default is \link[readr]{read_csv}
+#' @param n_files Maximum number of files to read in
 #' @param ... Additional arguments passed to the `.f` read function
 #'
 #' @return Contents of the files in the repository that have read using ".f" function supplied. If `to_tibble = TRUE` then the function will try to stack results on top of each other and return a `tibble`. If `to_tibble = FALSE` then the returned object will be a list with as many elements as there are files in the repository that match the "pattern" argument.
 #'
+#' @examples
+#' \dontrun{
+#' read_repo(repo = "cdcepi/Flusight-forecast-data",
+#'           branch = "master",
+#'           pattern = "data-forecasts/.*/.*\\.csv",
+#'           to_tibble = TRUE,
+#'           .f = readr::read_csv,
+#'           n_files=10,
+#'           col_types="DcDccdd",
+#'           progress=FALSE)
+#' }
 #' @export
 #'
 #' @md
 #'
-read_repo <- function(repo, branch = "master", pattern = NULL, to_tibble = FALSE, .f = readr::read_csv, ...) {
+read_repo <- function(repo, branch = "master", pattern = NULL, to_tibble = FALSE, .f = readr::read_csv, n_files=NULL, ...) {
 
   ## construct GET request from the repo and branch
   api_request <- httr::GET(paste0("https://api.github.com/repos/",
@@ -37,16 +49,19 @@ read_repo <- function(repo, branch = "master", pattern = NULL, to_tibble = FALSE
   ## extract path element from the API response
   repo_files <- purrr::map_chr(httr::content(api_request)$tree, "path")
 
-  ## if a pattern is passed use it to parse files of interest
-  if(!is.null(pattern)) {
-    repo_files <- repo_files[grepl(pattern, repo_files)]
-  }
-
   ## construct raw content URLs to files of interest
   repo_files <- file.path("https://raw.githubusercontent.com",
                           repo,
                           branch,
                           repo_files)
+
+  ## only get files matching pattern
+  repo_files <- grep(pattern, repo_files, value=TRUE)
+
+  ## Limit the number of files
+  if (!is.null(n_files) && is.numeric(n_files)) {
+    repo_files <- repo_files[1:min(n_files, length(repo_files))]
+  }
 
   ## check that the value passed to .f is a function available in the environment
   .f <- match.fun(.f)
