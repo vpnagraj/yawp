@@ -51,6 +51,7 @@ read_repo(repo = "cdcepi/Flusight-forecast-data",
           .f = readr::read_csv,
           n_files=10,
           col_types="DcDccdd",
-          progress=FALSE)
+          progress=FALSE,
+          .id="forecast_filename")
 }
 }
