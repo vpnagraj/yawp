@@ -31,7 +31,8 @@
 #'           .f = readr::read_csv,
 #'           n_files=10,
 #'           col_types="DcDccdd",
-#'           progress=FALSE)
+#'           progress=FALSE,
+#'           .id="forecast_filename")
 #' }
 #' @export
 #'
@@ -59,6 +60,9 @@ read_repo <- function(repo, branch = "master", pattern = NULL, to_tibble = FALSE
   if(!is.null(pattern)) {
     repo_files <- repo_files[grepl(pattern, repo_files)]
   }
+
+  ## Set names
+  names(repo_files) <- basename(repo_files)
 
   ## Limit the number of files
   if (!is.null(n_files) && is.numeric(n_files)) {
