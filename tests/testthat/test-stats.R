@@ -51,3 +51,27 @@ test_that("f1 score is correct for use_thresh = FALSE", {
   expect_equal(round(tst,3), 0.849)
 
 })
+
+test_that("f1 errors when positive value is 0", {
+  dat <- data.frame(obs = c(1,0,1), truth = c(1,1,0))
+  expect_error(f1(dat, observed = obs, truth = truth, positive = "0"))
+})
+
+test_that("f1 errors when there are no matching values", {
+  dat <- data.frame(obs = c("A","A"), truth = c("B","B"))
+  expect_error(f1(dat, observed = obs, truth = truth, positive = "A"))
+})
+
+test_that("f1 calculates correctly with thresholds", {
+  dat <- tibble::tibble(prob = c(0.1,0.4,0.6,0.9),
+                        truth = c("0","0","1","1"))
+  res <- f1(dat, observed = prob, truth = truth,
+            positive = "1", use_thresh = TRUE,
+            thresh = c(0.5, 0.7))
+  expect_equal(res$f1, c(1, 2*((1*0.5)/(1+0.5))))
+})
+
+test_that("propf handles NA levels and percent = FALSE", {
+  x <- c("a","b",NA,"a")
+  expect_equal(propf(x, level = NA, percent = FALSE), "1 (0.25)")
+})
